@@ -10,6 +10,7 @@ $db = new dbAdapter($dbh);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           crossorigin="anonymous">
     <link href="assets/css/style.css" rel="stylesheet"/>
+    <link href="assets/css/air-datepicker.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
 </head>
@@ -40,8 +41,11 @@ $db = new dbAdapter($dbh);
                     </select>
                 <?php } ?>
 
-                <label for="customRange1" class="form-label" id="count">Количество дней:</label>
-                <input type="number" name="days" class="form-control" id="customRange1" min="1" max="30" value="0">
+                <label for="customRangeStart" class="form-label" id="countStart">Начало аренды:</label>
+                <input type="text" name="daysStart" class="form-control" id="customRangeStart">
+
+                <label for="customRangeEnd" class="form-label" id="countEnd">Окончание аренды:</label>
+                <input type="text" name="daysEnd" class="form-control" id="customRangeEnd">
 
                 <?php $services = unserialize($db->mselect_rows('a25_settings', ['set_key' => 'services'], 0, 1, 'id')[0]['set_value']);
                 if (is_array($services)) {
@@ -74,6 +78,7 @@ $db = new dbAdapter($dbh);
     </div>
 </div>
 
+<script src="assets/js/air-datepicker.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
@@ -94,7 +99,7 @@ $db = new dbAdapter($dbh);
         });
 
 
-		$("#product, #form input[name=days]").on("change", function(event) {
+		$("#product, #form input[type=checkbox]").on("change", function(event) {
 			$("#form").submit();
 		})
 		$("#product").on("change", function(event) {
@@ -112,6 +117,24 @@ $db = new dbAdapter($dbh);
 		})
 
 	});
+
+
+	// air-datepicker init
+	var AirDatepicker_settings = {
+		isMobile: true,
+		autoClose: true,
+		locale: {
+			dateFormat: 'yyyy-MM-dd'
+		},
+		onHide(isFinished) {
+			if (isFinished) {
+				$("#form").submit();
+			}
+		}
+	};
+	new AirDatepicker("#customRangeStart", AirDatepicker_settings);
+	new AirDatepicker("#customRangeEnd", AirDatepicker_settings);
+	// air-datepicker init end
 </script>
 </body>
 </html>
