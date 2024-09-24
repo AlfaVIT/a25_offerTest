@@ -1,16 +1,20 @@
 <?php
 namespace App;
 require_once 'Infrastructure/sdbh.php'; use sdbh\sdbh; 
+require_once 'Application/sdbhInterface.php';
+require_once 'Application/dbAdapter.php';
+use dbAdapter;
 
 class Calculate
 {
     public function calculate1()
     {
         $dbh = new sdbh();
+		$db = new dbAdapter($dbh);
         $days = isset($_POST['days']) ? $_POST['days'] : 0;
         $product_id = isset($_POST['product']) ? $_POST['product'] : 0;
         $selected_services = isset($_POST['services']) ? $_POST['services'] : [];
-        $product = $dbh->make_query("SELECT * FROM a25_products WHERE ID = $product_id");
+        $product = $db->make_query("SELECT * FROM a25_products WHERE ID = $product_id");
         if ($product) {
             $product = $product[0];
             $price = $product['PRICE'];
