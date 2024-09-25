@@ -11,6 +11,7 @@ $db = new dbAdapter($dbh);
           crossorigin="anonymous">
     <link href="assets/css/style.css" rel="stylesheet"/>
     <link href="assets/css/air-datepicker.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
 </head>
@@ -86,11 +87,13 @@ $db = new dbAdapter($dbh);
             event.preventDefault();
 
             $.ajax({
-                url: 'App/calculate.php',
+                url: 'App/Presentation/calculatePresentation.php',
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
-                    $("#total-price").text(response);
+					$(".tooltip").hide();
+                    $("#total-price").html(response);
+					$('[data-toggle="tooltip"]').tooltip();
                 },
                 error: function() {
                     $("#total-price").text('Ошибка при расчете');
