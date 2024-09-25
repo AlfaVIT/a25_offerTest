@@ -50,6 +50,18 @@
 
 
 		/**
+		 * Добавление записи в таблицу
+		 * @param string $tbl_name - Имя таблицы
+		 * @param array $rows - ассоциативный массив {"поле" => "значение"}
+		 * @return integer число добавленных записей
+		 */
+		public function insert_rows($tbl_name, $rows) 
+		{
+			return $this->sdbh->insert_rows($tbl_name, $rows);
+		}
+
+
+		/**
 		 * Специальный метод получения тарифной сетки
 		 * 
 		 * @param string $product_id - ID продукта

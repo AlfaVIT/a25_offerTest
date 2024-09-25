@@ -26,7 +26,7 @@ $db = new dbAdapter($dbh);
 
     <div class="row row-form">
         <div class="col-12">
-            <form action="App/calculate.php" method="POST" id="form">
+            <form action="App/Presentation/calculatePresentation.php" method="POST" id="form">
 
                 <?php $products = $db->make_query('SELECT * FROM a25_products');
                 if (is_array($products)) { ?>

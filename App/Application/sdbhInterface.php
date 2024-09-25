@@ -4,6 +4,7 @@
 	interface sdbhInterface 
 	{
 		public function make_query($query);
+		public function insert_rows($tbl_name, $rows);
 		public function mselect_rows(
 			$tbl_name,
 			$select_array,
