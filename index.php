@@ -1,12 +1,17 @@
 <?php
 require_once 'App/Infrastructure/sdbh.php'; use sdbh\sdbh;
 $dbh = new sdbh();
+require_once 'App/Application/sdbhInterface.php';
+require_once 'App/Application/dbAdapter.php';
+$db = new dbAdapter($dbh);
 ?>
 <html>
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           crossorigin="anonymous">
     <link href="assets/css/style.css" rel="stylesheet"/>
+    <link href="assets/css/air-datepicker.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
 </head>
@@ -21,9 +26,9 @@ $dbh = new sdbh();
 
     <div class="row row-form">
         <div class="col-12">
-            <form action="App/calculate.php" method="POST" id="form">
+            <form action="App/Presentation/calculatePresentation.php" method="POST" id="form">
 
-                <?php $products = $dbh->make_query('SELECT * FROM a25_products');
+                <?php $products = $db->make_query('SELECT * FROM a25_products');
                 if (is_array($products)) { ?>
                     <label class="form-label" for="product">Выберите продукт:</label>
                     <select class="form-select" name="product" id="product">
@@ -37,10 +42,13 @@ $dbh = new sdbh();
                     </select>
                 <?php } ?>
 
-                <label for="customRange1" class="form-label" id="count">Количество дней:</label>
-                <input type="number" name="days" class="form-control" id="customRange1" min="1" max="30">
+                <label for="customRangeStart" class="form-label" id="countStart">Начало аренды:</label>
+                <input type="text" name="daysStart" class="form-control" id="customRangeStart">
 
-                <?php $services = unserialize($dbh->mselect_rows('a25_settings', ['set_key' => 'services'], 0, 1, 'id')[0]['set_value']);
+                <label for="customRangeEnd" class="form-label" id="countEnd">Окончание аренды:</label>
+                <input type="text" name="daysEnd" class="form-control" id="customRangeEnd">
+
+                <?php $services = unserialize($db->mselect_rows('a25_settings', ['set_key' => 'services'], 0, 1, 'id')[0]['set_value']);
                 if (is_array($services)) {
                     ?>
                     <label for="customRange1" class="form-label">Дополнительно:</label>
@@ -61,10 +69,17 @@ $dbh = new sdbh();
             </form>
 
             <h5>Итоговая стоимость: <span id="total-price"></span></h5>
-        </div>
+
+            <h5>Тариф:</h5>
+            <span id="tariff">
+            <?php include("App/tariff.php"); ?>
+            </span>
+
+		</div>
     </div>
 </div>
 
+<script src="assets/js/air-datepicker.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
@@ -72,18 +87,57 @@ $dbh = new sdbh();
             event.preventDefault();
 
             $.ajax({
-                url: 'App/calculate.php',
+                url: 'App/Presentation/calculatePresentation.php',
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
-                    $("#total-price").text(response);
+					$(".tooltip").hide();
+                    $("#total-price").html(response);
+					$('[data-toggle="tooltip"]').tooltip();
                 },
                 error: function() {
                     $("#total-price").text('Ошибка при расчете');
                 }
             });
         });
-    });
+
+
+		$("#product, #form input[type=checkbox]").on("change", function(event) {
+			$("#form").submit();
+		})
+		$("#product").on("change", function(event) {
+            $.ajax({
+                url: 'App/tariff.php',
+                type: 'POST',
+                data: {'product':$(this).val()},
+                success: function(response) {
+                    $("#tariff").html(response);
+                },
+                error: function() {
+                    $("#tariff").html('Ошибка передачи данных');
+                }
+            });
+		})
+
+	});
+
+
+	// air-datepicker init
+	var AirDatepicker_settings = {
+		isMobile: true,
+		autoClose: true,
+		locale: {
+			dateFormat: 'yyyy-MM-dd'
+		},
+		onHide(isFinished) {
+			if (isFinished) {
+				$("#form").submit();
+			}
+		}
+	};
+	new AirDatepicker("#customRangeStart", AirDatepicker_settings);
+	new AirDatepicker("#customRangeEnd", AirDatepicker_settings);
+	// air-datepicker init end
 </script>
 </body>
 </html>

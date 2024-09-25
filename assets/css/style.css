@@ -9,3 +9,7 @@ h1{
 .row-header{
     margin: 50px 0;
 }
+
+.tooltip-inner {
+    white-space:pre-wrap;
+}
